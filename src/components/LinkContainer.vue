@@ -14,7 +14,7 @@
           <input
             type="text"
             id="long-url"
-            name="long-URL"
+            name="longURL"
             v-model="longURL"
             placeholder="Place Your URL here..."
             class="py-3 px-4 w-full border-gray-200 shadow-sm rounded-s-full text-lg focus:z-10 focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none placeholder:text-gray-500"
@@ -34,7 +34,7 @@
         >
           <button
             class="absolute top-1 right-1 ml-5"
-            @click="() => (isShortURL = false)"
+            @click="() => ((isShortURL = false), (longURL = ''))"
           >
             <img
               src="../assets/icons/icons8-close.svg"
@@ -55,7 +55,7 @@
             <button
               type="button"
               class="btn flex items-center gap-1 border-2 border-gray-600 bg-white/80 text-black font-bold rounded-xl py-1 px-2 text-xs active:shadow-md active:text-gray-500"
-              :data-clipboard-text="longURL"
+              :data-clipboard-text="shortURL"
               @click="copyURL"
             >
               <img
@@ -73,6 +73,7 @@
 </template>
 
 <script setup>
+import axios from "axios";
 import ClipboardJS from "clipboard";
 import { computed, onMounted, ref, watch } from "vue";
 
@@ -97,12 +98,19 @@ watch(longURL, () => {
   }
 });
 
-const onSubmit = () => {
-  if (inputRef.value.value !== "") {
-    // const formData = new FormData(formRef.value);
-    // longURL.value = inputRef.value.value;
-    const id = generateUniqueIDforShortURL();
-    shortURL.value = `https://short.ly/${id}`;
+const onSubmit = async () => {
+  const isURLValid =
+    /[-a-zA-Z0-9@:%._\\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)/gi.test(
+      inputRef.value.value
+    );
+  if (inputRef.value.value !== "" && isURLValid) {
+    const formData = new FormData(formRef.value);
+
+    const responce = await axios.post(
+      `${process.env.VUE_APP_API_URL}/shorturl`,
+      formData
+    );
+    shortURL.value = responce.data;
     isShortURL.value = true;
   } else {
     errorMSG.value = "URL Requeired!!!";
@@ -116,16 +124,4 @@ const copyURL = () => {
     e.clearSelection();
   });
 };
-
-function generateUniqueIDforShortURL() {
-  const charSet = process.env.VUE_APP_CHARSET;
-  const length = 12;
-
-  let gnid = "";
-  for (let i = 0; i < length; i++) {
-    gnid += charSet[Math.floor(Math.random() * charSet.length)];
-  }
-
-  return gnid;
-}
 </script>

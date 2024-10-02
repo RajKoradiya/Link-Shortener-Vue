@@ -4,8 +4,13 @@
   >
     <div class="flex flex-col mx-auto w-9/12 gap-14">
       <div class="mb-8 space-y-3">
-        <p class="text-4xl text-center font-extrabold">Link Shortener</p>
-        <p class="text-white text-center text-xl">
+        <div class="flex items-center justify-center">
+          <p class="text-4xl text-center font-medium header" id="headerRef"></p>
+          <span
+            class="inline-block w-[2px] h-7 bg-white ml-2 inner-cursor"
+          ></span>
+        </div>
+        <p class="text-white text-center text-xl header">
           Shorten, Share, and Track Links Instantly with a URL Shortener
         </p>
       </div>
@@ -86,6 +91,8 @@ const errorMSG = ref("");
 
 onMounted(() => {
   inputRef.value.focus();
+  const header = document.getElementById("headerRef");
+  typeSentence("Link Shortener...", header);
 });
 
 const isResponce = computed(() => (isShortURL.value ? true : false));
@@ -126,4 +133,53 @@ const copyURL = () => {
     e.clearSelection();
   });
 };
+
+async function typeSentence(sentence, eleRef, delay = 100) {
+  const letters = sentence.split("");
+  const letterLength = letters.length;
+  let i = 0;
+  while (i < letters.length) {
+    await waitForMs(delay);
+    eleRef.append(letters[i]);
+    i++;
+  }
+  if (i === letterLength) {
+    document.querySelector(".inner-cursor").remove();
+  }
+  return;
+}
+
+function waitForMs(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 </script>
+
+<style>
+@font-face {
+  font-family: "sourcecodepro";
+  src: url(../assets/fonts/Source_Code_Pro/static/SourceCodePro-Medium.ttf);
+}
+
+.header {
+  font-family: "sourcecodepro";
+}
+
+@keyframes blink {
+  0% {
+    opacity: 1;
+  }
+  40% {
+    opacity: 1;
+  }
+  60% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.inner-cursor {
+  animation: blink 0.6s linear infinite alternate;
+}
+</style>

@@ -1,6 +1,6 @@
 <template>
   <div
-    class="w-3/4 h-3/4 bg-gray-500 border border-gray-200 rounded-lg flex items-center"
+    class="w-3/4 h-3/4 bg-white/40 border border-gray-200 rounded-lg flex items-center backdrop-blur-sm"
   >
     <div class="flex flex-col mx-auto w-9/12 gap-14">
       <div class="mb-8 space-y-3">
@@ -93,8 +93,6 @@ const isResponce = computed(() => (isShortURL.value ? true : false));
 watch(longURL, () => {
   if (longURL.value) {
     errorMSG.value = "";
-  } else {
-    errorMSG.value = "URL Requeired!!!";
   }
 });
 
@@ -103,7 +101,7 @@ const onSubmit = async () => {
     /[-a-zA-Z0-9@:%._\\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)/gi.test(
       inputRef.value.value
     );
-  if (inputRef.value.value !== "" && isURLValid) {
+  if (isURLValid) {
     const formData = new FormData(formRef.value);
 
     const responce = await axios.post(
@@ -113,7 +111,11 @@ const onSubmit = async () => {
     shortURL.value = responce.data;
     isShortURL.value = true;
   } else {
-    errorMSG.value = "URL Requeired!!!";
+    if (inputRef.value.value === "") {
+      errorMSG.value = "URL Requeired!!!";
+    } else {
+      errorMSG.value = "Invalid URL!!!";
+    }
   }
 };
 
